@@ -965,7 +965,7 @@ img{max-width:100%}
     var html = '';
     for (var volta = 0; volta < 2; volta++) {
       for (var i = 0; i < ARTES.length; i++) {
-        html += '<img src="media/' + ARTES[i] + '.webp" alt="' + LEG[i] + '" loading="lazy" decoding="async" width="563" height="1000"' + (volta ? ' aria-hidden="true"' : '') + '>';
+        html += '<img src="media/' + ARTES[i] + '.webp" alt="' + LEG[i] + '" loading="eager" decoding="async" width="563" height="1000"' + (volta ? ' aria-hidden="true"' : '') + '>';
       }
     }
     fila.innerHTML = html;
