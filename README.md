@@ -24,16 +24,16 @@ Suba `index.html` e a pasta `media/` na raiz do domínio.
 
 ## Acesso só por celular
 
-`index.html` tem, no topo, um script que detecta o aparelho. Celular e tablet veem a página;
-computador é mandado para `/pagina-nao-encontrada`, preservando os parâmetros de UTM da URL.
-A detecção é por aparelho (user agent, tela de toque, ponteiro), não por largura de tela,
-então notebook de qualquer tamanho também é barrado. Na dúvida, o script deixa passar,
-para nunca barrar um cliente de verdade.
+`index.html` tem, no topo, um script que detecta o aparelho pelo user agent. Celular e tablet
+veem a página; computador e notebook são redirecionados para `https://www.google.com/404`,
+sem levar os parâmetros de UTM. Não há limite de largura de tela: o bloqueio é por aparelho.
 
 Para liberar o computador, apague esse `<script>` do começo do `index.html`.
+Para mandar o computador para uma tela de erro própria em vez do Google, troque
+`URL_ERRO_404` por `/pagina-nao-encontrada`.
 
-- `pagina-nao-encontrada.html` — a tela de erro que o computador vê
-- `404.html` — a mesma tela, usada pela hospedagem em qualquer endereço que não existe
+- `404.html` — tela de erro usada pela hospedagem em endereços que não existem
+- `pagina-nao-encontrada.html` — tela de erro própria, hoje não usada pelo script
 
 ## Checkouts
 - Completo R$ 19,90 — `offer=0JH88N1`
