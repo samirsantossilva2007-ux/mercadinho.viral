@@ -1150,7 +1150,49 @@ img{max-width:100%}
     s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
   }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', '1673948757736761');
-  fbq('track', 'PageView');
+
+  // Mesmo id nos dois lados: o Meta junta o evento do navegador com o do
+  // servidor em vez de contar duas vezes.
+  function novoId() {
+    try { return crypto.randomUUID(); } catch (e) {}
+    return Date.now() + '-' + Math.random().toString(16).slice(2);
+  }
+  function cookie(nome) {
+    var m = document.cookie.match('(^|;)\\s*' + nome + '=([^;]*)');
+    return m ? decodeURIComponent(m[2]) : '';
+  }
+  // Envia pelo servidor também (API de Conversões), sem travar a página.
+  window.mvEvento = function (nome, extra) {
+    var id = novoId();
+    try { fbq('track', nome, extra || {}, { eventID: id }); } catch (e) {}
+    try {
+      var dados = {
+        event_name: nome, event_id: id,
+        event_source_url: location.href,
+        fbp: cookie('_fbp'), fbc: cookie('_fbc')
+      };
+      if (extra && extra.value) { dados.value = extra.value; dados.currency = extra.currency; }
+      var texto = JSON.stringify(dados);
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/evento', new Blob([texto], { type: 'application/json' }));
+      } else {
+        fetch('/api/evento', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                               body: texto, keepalive: true }).catch(function () {});
+      }
+    } catch (e) {}
+    return id;
+  };
+
+  window.mvEvento('PageView');
+
+  // Clique em qualquer botão de checkout = InitiateCheckout, com o valor do plano.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href*="checkout.wiven.com.br"]') : null;
+    if (!a) return;
+    var oferta = (a.getAttribute('href').match(/offer=([A-Z0-9]+)/) || [])[1];
+    var valores = { '0JH88N1': 19.90, 'RHVI2GY': 17.90, 'TX40A54': 10.00 };
+    window.mvEvento('InitiateCheckout', { value: valores[oferta] || 0, currency: 'BRL' });
+  }, true);
 </script>
 <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1673948757736761&ev=PageView&noscript=1"></noscript>
 </body>
